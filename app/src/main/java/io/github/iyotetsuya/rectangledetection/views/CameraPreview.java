@@ -11,7 +11,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -64,16 +63,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCameraId = 0;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            mCamera = Camera.open(mCameraId);
-        } else {
-            mCamera = Camera.open();
-        }
-        Camera.Parameters cameraParams = mCamera.getParameters();
-        mPreviewSizeList = cameraParams.getSupportedPreviewSizes();
-        mPictureSizeList = cameraParams.getSupportedPictureSizes();
-    }
+        try {
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+                mCamera = Camera.open(mCameraId);
+            } else {
+                mCamera = Camera.open();
+            }
+            Camera.Parameters cameraParams = mCamera.getParameters();
+            mPreviewSizeList = cameraParams.getSupportedPreviewSizes();
+            mPictureSizeList = cameraParams.getSupportedPictureSizes();
+        } catch (Exception e) {
+            Log.e("CameraPreview", e.toString());
+        }
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -145,7 +148,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 Log.w(TAG, "Gave up starting preview");
             }
         }
-
     }
 
     protected Camera.Size determinePreviewSize(boolean portrait, int reqWidth, int reqHeight) {
@@ -215,7 +217,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     protected boolean adjustSurfaceLayoutSize(Camera.Size previewSize, boolean portrait,
-                                              int availableWidth, int availableHeight) {
+            int availableWidth, int availableHeight) {
         float tmpLayoutHeight, tmpLayoutWidth;
         if (portrait) {
             tmpLayoutHeight = previewSize.width;
@@ -258,7 +260,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 layoutParams.topMargin = mCenterPosY - (layoutHeight / 2);
                 layoutParams.leftMargin = mCenterPosX - (layoutWidth / 2);
             }
-            this.setLayoutParams(layoutParams); // this will trigger another surfaceChanged invocation.
+            this.setLayoutParams(
+                    layoutParams); // this will trigger another surfaceChanged invocation.
             layoutChanged = true;
         } else {
             layoutChanged = false;
@@ -309,8 +312,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         cameraParams.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
         cameraParams.setPictureSize(mPictureSize.width, mPictureSize.height);
-        Log.v(TAG, "Preview Actual Size - w: " + mPreviewSize.width + ", h: " + mPreviewSize.height);
-        Log.v(TAG, "Picture Actual Size - w: " + mPictureSize.width + ", h: " + mPictureSize.height);
+        Log.v(TAG,
+                "Preview Actual Size - w: " + mPreviewSize.width + ", h: " + mPreviewSize.height);
+        Log.v(TAG,
+                "Picture Actual Size - w: " + mPictureSize.width + ", h: " + mPictureSize.height);
 
         mCamera.setParameters(cameraParams);
     }
@@ -339,5 +344,4 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             });
         }
     }
-
 }

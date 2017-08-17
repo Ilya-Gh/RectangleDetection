@@ -99,7 +99,6 @@ public class OpenCVHelper {
 
     public static Observable<MatData> getContoursMat(MatData matData) {
         return Observable.create(sub -> {
-            //特徵化
             long now = System.currentTimeMillis();
             ArrayList<MatOfPoint> contours = new ArrayList<>();
             Imgproc.findContours(matData.monoChrome.clone(), contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -181,7 +180,7 @@ public class OpenCVHelper {
         });
     }
 
-    public static int getDistance(Point point) {
+    private static int getDistance(Point point) {
         double x1 = 0;
         double x2 = point.x;
         double y1 = 0;
